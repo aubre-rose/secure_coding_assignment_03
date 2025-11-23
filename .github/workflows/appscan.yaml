@@ -1,0 +1,28 @@
+name: AppScan CodeSweep Scan
+
+on:
+  workflow_dispatch: {}  # Simple format that always works
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Download and run AppScan
+      run: |
+        wget -q -O codesweep.jar "https://cloud.appscan.com/api/SCX/StaticAnalyzer/SAClient?type=cli"
+        java -jar codesweep.jar -s . -o results.html -f html
+
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: appscan-results
+        path: results.html
